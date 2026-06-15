@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CipherLab Web Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar" aria-label="Main navigation">
+      <a class="brand" href="#home" aria-label="CipherLab home">
+        <span class="brand-mark">CL</span>
+        <span>CipherLab</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+      <nav class="nav-links">
+        <a href="#cipher" data-mode-link="encrypt">Encrypt</a>
+        <a href="#cipher" data-mode-link="decrypt">Decrypt</a>
+        <a href="#assistant">AI Assistant</a>
+        <a href="#tools">Tools</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero section-band" id="home">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Professional cryptography workspace</p>
+            <h1>CipherLab</h1>
+            <p class="hero-kicker">Encrypt • Decrypt • Analyze</p>
+            <p class="hero-subtitle">Advanced Cryptography Toolkit with Intelligent Cipher Analysis</p>
+            <div class="hero-actions">
+              <a class="btn primary glow" href="#cipher">Get Started</a>
+              <a class="btn secondary" href="#assistant">AI Assistant</a>
+            </div>
+          </div>
+          <div class="signal-panel" aria-label="CipherLab status panel">
+            <div class="signal-header">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="signal-lines" aria-hidden="true">
+              <p>&gt; initializing cipher matrix...</p>
+              <p>&gt; loading caesar, vigenere, affine</p>
+              <p>&gt; entropy scan: <strong>active</strong></p>
+              <p>&gt; assistant confidence engine: <strong>online</strong></p>
+            </div>
+            <div class="scan-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace section-band" id="cipher">
+        <div class="section-heading">
+          <p class="eyebrow">Encrypt / Decrypt</p>
+          <h2>Run Cipher Operations</h2>
+          <p>Select a method, provide the required parameter, and generate a clean output instantly.</p>
+        </div>
+
+        <div class="workspace-grid">
+          <form class="control-panel" id="cipherForm">
+            <div class="form-row split">
+              <label>
+                Cipher Type
+                <select id="cipherType" name="cipher">
+                  <option value="caesar">Caesar Cipher</option>
+                  <option value="vigenere">Vigenère Cipher</option>
+                  <option value="atbash">Atbash Cipher</option>
+                  <option value="rot13">ROT13</option>
+                  <option value="morse">Morse Code</option>
+                  <option value="base64">Base64</option>
+                  <option value="binary">Binary / ASCII</option>
+                  <option value="xor">XOR Cipher</option>
+                  <option value="rail_fence">Rail Fence Cipher</option>
+                  <option value="affine">Affine Cipher</option>
+                </select>
+              </label>
+              <label id="alphabetGroup">
+                Alphabet
+                <select id="alphabet" name="alphabet">
+                  <option value="english">English A-Z</option>
+                  <option value="turkish">Turkish ABCÇ</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Input Text
+              <textarea id="inputText" rows="8" maxlength="10000" placeholder="Paste plaintext or ciphertext here"></textarea>
+            </label>
+            <div class="counter-row">
+              <span id="charCount">0 characters</span>
+              <span id="fieldHint">Caesar uses a numeric shift. Try 3 for a classic example.</span>
+            </div>
+
+            <div class="dynamic-fields">
+              <label class="param-field" data-param="shift">
+                Caesar Movement
+                <span class="inline-inputs">
+                  <span class="mini-field">
+                    <span>Shift</span>
+                    <input id="shift" type="number" value="3" inputmode="numeric" aria-label="Forward shift value" title="Forward shift">
+                  </span>
+                  <span class="mini-field">
+                    <span>Back</span>
+                    <input id="back" type="number" value="0" min="0" inputmode="numeric" aria-label="Backward shift value" title="Backward shift">
+                  </span>
+                </span>
+              </label>
+              <label class="param-field hidden" data-param="key">
+                Key
+                <input id="key" type="text" autocomplete="off" placeholder="Enter key">
+              </label>
+              <label class="param-field hidden" data-param="rails">
+                Rails
+                <input id="rails" type="number" value="3" min="2" inputmode="numeric">
+              </label>
+              <label class="param-field hidden" data-param="affine">
+                Affine Parameters
+                <span class="inline-inputs">
+                  <input id="affineA" type="number" value="5" aria-label="Affine a value">
+                  <input id="affineB" type="number" value="8" aria-label="Affine b value">
+                </span>
+              </label>
+            </div>
+
+            <div class="button-row">
+              <button class="btn primary" type="submit" data-action="encrypt">Encrypt</button>
+              <button class="btn secondary" type="submit" data-action="decrypt">Decrypt</button>
+            </div>
+          </form>
+
+          <aside class="output-panel" aria-live="polite">
+            <div class="panel-title">
+              <div>
+                <p class="eyebrow">Result</p>
+                <h3>Output Panel</h3>
+              </div>
+              <span class="status-pill" id="resultStatus">Ready</span>
+            </div>
+            <pre id="cipherResult">Your result will appear here.</pre>
+            <div class="button-row compact">
+              <button class="icon-btn" type="button" id="copyResult" title="Copy result" aria-label="Copy result">⧉</button>
+              <button class="icon-btn" type="button" id="downloadResult" title="Download TXT" aria-label="Download result as TXT">⇩</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="assistant section-band" id="assistant">
+        <div class="section-heading">
+          <p class="eyebrow">Intelligent Analysis</p>
+          <h2>CipherLab AI Assistant</h2>
+          <p>Analyze encrypted text and surface likely methods, parameters, confidence, and possible plaintext.</p>
+        </div>
+
+        <div class="assistant-grid">
+          <form class="control-panel" id="assistantForm">
+            <label>
+              Encrypted Text
+              <textarea id="assistantInput" rows="9" maxlength="10000" placeholder="Paste encrypted text for analysis"></textarea>
+            </label>
+            <div class="counter-row">
+              <span id="assistantCount">0 characters</span>
+              <span>Longer samples improve Caesar, Vigenère, and Affine guesses.</span>
+            </div>
+            <button class="btn primary glow" type="submit">Analyze Cipher</button>
+          </form>
+
+          <div class="analysis-panel" id="analysisPanel" aria-live="polite">
+            <div class="empty-state">
+              <span class="pulse-dot"></span>
+              <p>Analysis results will appear after a scan.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tools section-band" id="tools">
+        <div class="section-heading">
+          <p class="eyebrow">Session Tools</p>
+          <h2>History</h2>
+          <p>Recent operations stay temporary and reset when the page is closed. Save them only when you need a local TXT copy.</p>
+        </div>
+        <div class="history-actions">
+          <button class="btn secondary" type="button" id="saveHistory">Save History</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <p class="muted">No operations yet.</p>
+        </div>
+      </section>
+
+      <section class="about section-band" id="about">
+        <div class="about-grid">
+          <div>
+            <p class="eyebrow">About</p>
+            <h2>Built for classical cipher exploration</h2>
+          </div>
+          <p>CipherLab Web Edition brings the original terminal toolkit into a responsive Flask interface. Classical ciphers are useful for learning and analysis; sensitive real-world communication should use modern, audited cryptographic systems.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="loader hidden" id="loader" role="status" aria-label="Loading"></div>
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
